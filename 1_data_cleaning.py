@@ -289,90 +289,141 @@ sleep_duration_bin_labels = [
     "14+",
 ]
 
-for variable in sleep_duration_vars:
-    sleep_duration_subset = df_clean.loc[df_clean["year"].isin(all_sleep_years), ["year", variable]].dropna()
-    binned_sleep_duration = pd.cut(
-        sleep_duration_subset[variable],
-        bins=sleep_duration_bins,
-        labels=sleep_duration_bin_labels,
-        right=False,
-    )
-    sleep_duration_counts = (
-        pd.crosstab(binned_sleep_duration, sleep_duration_subset["year"])
-        .reindex(index=sleep_duration_bin_labels, columns=all_sleep_years, fill_value=0)
-    )
-
-    print(f"\nBinned sleep duration counts for {variable}:")
-    print(sleep_duration_counts)
-
-    ax = sleep_duration_counts.plot(kind="bar", figsize=(14, 6), width=0.85)
-    ax.set_title(f"Binned distribution of {variable} by year")
-    ax.set_xlabel(variable)
-    ax.set_ylabel("Count")
-    ax.legend(title="Year")
-
-    plt.xticks(rotation=30, ha="right")
-    plt.tight_layout()
-    plt.savefig(EDA_CHART_DIR / f"{variable}_by_year_barchart.png", dpi=300)
-    plt.close()
-
-    print(f"Saved chart: {EDA_CHART_DIR / f'{variable}_by_year_barchart.png'}")
 
 
-# Create current EDA charts
 
-chart_specs = [
-    ("PHQ_sum", "PHQ_sum_bar_chart.png"),
-    ("BP1_numeric", "BP1_original_bar_chart.png"),
-    ("BP1_reversed", "BP1_reversed_bar_chart.png"),
-    ("pulse_irregular", "pulse_irregular_bar_chart.png"),
-]
 
-for variable, output_name in chart_specs:
-    counts = df_clean[variable].dropna().astype(int).value_counts().sort_index()
 
-    print(f"\nValue counts for {variable}:")
-    print(counts)
 
-    ax = counts.plot(kind="bar", figsize=(12, 6))
-    ax.set_title(f"Distribution of {variable}")
-    ax.set_xlabel(variable)
-    ax.set_ylabel("Count")
-    ax.bar_label(ax.containers[0], fontsize=8)
 
-    plt.xticks(rotation=0)
-    plt.tight_layout()
-    plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
-    plt.close()
 
-    print(f"Saved chart: {EDA_CHART_DIR / output_name}")
 
+
+
+
+
+
+
+# Create current EDA charts Print
 
 activity_bins = [-0.5, 0.5, 29.5, 59.5, 119.5, 149.5, 299.5, 599.5, float("inf")]
 activity_bin_labels = ["0", "1-29", "30-59", "60-119", "120-149", "150-299", "300-599", "600+"]
-activity_chart_specs = [
-    ("total_mvpa_min_week", "total_mvpa_min_week_barchart.png"),
+
+chart_specs = [
+    {
+        "variable": "PHQ_sum",
+        "output_name": "PHQ_sum_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "BP1_numeric",
+        "output_name": "BP1_original_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "BP1_reversed",
+        "output_name": "BP1_reversed_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "pulse_irregular",
+        "output_name": "pulse_irregular_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "weekday_sleep_hours",
+        "output_name": "weekday_sleep_hours_by_year_barchart.png",
+        "chart_type": "binned_by_year",
+        "bins": sleep_duration_bins,
+        "bin_labels": sleep_duration_bin_labels,
+        "years": all_sleep_years,
+    },
+    {
+        "variable": "weekend_sleep_hours",
+        "output_name": "weekend_sleep_hours_by_year_barchart.png",
+        "chart_type": "binned_by_year",
+        "bins": sleep_duration_bins,
+        "bin_labels": sleep_duration_bin_labels,
+        "years": all_sleep_years,
+    },
+    {
+        "variable": "sleep_avg_weighted",
+        "output_name": "sleep_avg_weighted_by_year_barchart.png",
+        "chart_type": "binned_by_year",
+        "bins": sleep_duration_bins,
+        "bin_labels": sleep_duration_bin_labels,
+        "years": all_sleep_years,
+    },
+    {
+        "variable": "total_mvpa_min_week",
+        "output_name": "total_mvpa_min_week_barchart.png",
+        "chart_type": "binned",
+        "bins": activity_bins,
+        "bin_labels": activity_bin_labels,
+    },
 ]
 
-for variable, output_name in activity_chart_specs:
-    binned = pd.cut(
-        df_clean[variable],
-        bins=activity_bins,
-        labels=activity_bin_labels,
-        include_lowest=True,
-    )
-    counts = binned.value_counts().sort_index()
+for chart_spec in chart_specs:
+    variable = chart_spec["variable"]
+    output_name = chart_spec["output_name"]
+    chart_type = chart_spec["chart_type"]
 
-    print(f"\nBinned counts for {variable}:")
-    print(counts)
+    if chart_type == "value_counts":
+        counts = df_clean[variable].dropna().astype(int).value_counts().sort_index()
 
-    ax = counts.plot(kind="bar", figsize=(12, 6))
-    ax.set_title(f"Binned distribution of {variable}")
-    ax.set_xlabel(variable)
-    ax.set_ylabel("Count")
-    ax.bar_label(ax.containers[0], fontsize=8)
+        print(f"\nValue counts for {variable}:")
+        print(counts)
 
-    plt.xticks(rotation=30, ha="right")
+        ax = counts.plot(kind="bar", figsize=(12, 6))
+        ax.set_title(f"Distribution of {variable}")
+        ax.set_xlabel(variable)
+        ax.set_ylabel("Count")
+        ax.bar_label(ax.containers[0], fontsize=8)
+        plt.xticks(rotation=0)
+
+    elif chart_type == "binned":
+        binned = pd.cut(
+            df_clean[variable],
+            bins=chart_spec["bins"],
+            labels=chart_spec["bin_labels"],
+            include_lowest=True,
+        )
+        counts = binned.value_counts().sort_index()
+
+        print(f"\nBinned counts for {variable}:")
+        print(counts)
+
+        ax = counts.plot(kind="bar", figsize=(12, 6))
+        ax.set_title(f"Binned distribution of {variable}")
+        ax.set_xlabel(variable)
+        ax.set_ylabel("Count")
+        ax.bar_label(ax.containers[0], fontsize=8)
+        plt.xticks(rotation=30, ha="right")
+
+    elif chart_type == "binned_by_year":
+        years = chart_spec["years"]
+        subset = df_clean.loc[df_clean["year"].isin(years), ["year", variable]].dropna()
+        binned = pd.cut(
+            subset[variable],
+            bins=chart_spec["bins"],
+            labels=chart_spec["bin_labels"],
+            right=False,
+        )
+        counts = (
+            pd.crosstab(binned, subset["year"])
+            .reindex(index=chart_spec["bin_labels"], columns=years, fill_value=0)
+        )
+
+        print(f"\nBinned counts for {variable} by year:")
+        print(counts)
+
+        ax = counts.plot(kind="bar", figsize=(14, 6), width=0.85)
+        ax.set_title(f"Binned distribution of {variable} by year")
+        ax.set_xlabel(variable)
+        ax.set_ylabel("Count")
+        ax.legend(title="Year")
+        plt.xticks(rotation=30, ha="right")
+
     plt.tight_layout()
     plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
     plt.close()
