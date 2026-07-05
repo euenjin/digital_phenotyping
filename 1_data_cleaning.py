@@ -1,9 +1,13 @@
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pathlib import Path
 
 OUTPUT_DIR = Path(__file__).resolve().parent
-DATA_PATH = OUTPUT_DIR / "HN16_24_even_all.csv"
+EDA_CHART_DIR = OUTPUT_DIR / "eda_chart"
+EDA_CHART_DIR.mkdir(exist_ok=True)
+DATA_PATH = OUTPUT_DIR / "KNHANES_even_years_2014_2024_merged.csv"
 VALID_BP1 = [1, 2, 3, 4]
 
 # 1. Load original data
@@ -26,7 +30,7 @@ df_clean["PHQ_sum"] = pd.to_numeric(
 invalid_phq_mask = df_clean["PHQ_sum"].notna() & ~df_clean["PHQ_sum"].between(0, 27)
 
 print("\nPHQ_sum check:")
-print("Invalid PHQ_sum outside 0–27:", invalid_phq_mask.sum())
+print("Invalid PHQ_sum outside 0-27:", invalid_phq_mask.sum())
 
 df_clean.loc[invalid_phq_mask, "PHQ_sum"] = pd.NA
 
@@ -203,10 +207,44 @@ for variable, output_name in chart_specs:
 
     plt.xticks(rotation=0)
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / output_name, dpi=300)
+    plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
     plt.close()
 
-    print(f"Saved chart: {output_name}")
+    print(f"Saved chart: {EDA_CHART_DIR / output_name}")
+
+
+sleep_years = [2016, 2018, 2024]
+sleep_hour_specs = [
+    ("BP16_11", "Weekday bedtime hour", "sleep_weekday_bedtime_hour_by_year.png"),
+    ("BP16_13", "Weekday wake-up hour", "sleep_weekday_wakeup_hour_by_year.png"),
+    ("BP16_21", "Weekend bedtime hour", "sleep_weekend_bedtime_hour_by_year.png"),
+    ("BP16_23", "Weekend wake-up hour", "sleep_weekend_wakeup_hour_by_year.png"),
+]
+
+for variable, title, output_name in sleep_hour_specs:
+    sleep_hour = pd.to_numeric(df_clean[variable], errors="coerce")
+    valid_sleep_mask = df_clean["year"].isin(sleep_years) & sleep_hour.between(1, 24)
+    sleep_counts = (
+        pd.crosstab(sleep_hour.loc[valid_sleep_mask].astype(int), df_clean.loc[valid_sleep_mask, "year"])
+        .reindex(index=range(1, 25), columns=sleep_years, fill_value=0)
+    )
+
+    print(f"\nSleep hour counts for {variable}:")
+    print(sleep_counts)
+    print(f"Excluded missing/nonresponse/out-of-range for {variable}: {(df_clean['year'].isin(sleep_years) & ~sleep_hour.between(1, 24)).sum()}")
+
+    ax = sleep_counts.plot(kind="bar", figsize=(14, 6), width=0.85)
+    ax.set_title(f"{title} distribution by year")
+    ax.set_xlabel("Hour value")
+    ax.set_ylabel("Count")
+    ax.legend(title="Year")
+
+    plt.xticks(rotation=0)
+    plt.tight_layout()
+    plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
+    plt.close()
+
+    print(f"Saved chart: {EDA_CHART_DIR / output_name}")
 
 
 activity_bins = [-0.5, 0.5, 29.5, 59.5, 119.5, 149.5, 299.5, 599.5, float("inf")]
@@ -235,10 +273,10 @@ for variable, output_name in activity_chart_specs:
 
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / output_name, dpi=300)
+    plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
     plt.close()
 
-    print(f"Saved chart: {output_name}")
+    print(f"Saved chart: {EDA_CHART_DIR / output_name}")
 
 
 print("Current df_clean shape:", df_clean.shape)

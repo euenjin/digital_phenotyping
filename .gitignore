@@ -7,7 +7,7 @@ __pycache__/
 venv/
 
 # Large KNHANES dataset files
-*.sav
+KNHANES_even_years_2014_2024_merged.csv
 HN*.csv
 KNHANES*.csv
 *_all.csv
