@@ -1,0 +1,15 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Local environments
+.venv/
+venv/
+
+# Large KNHANES dataset files
+*.sav
+HN*.csv
+KNHANES*.csv
+*_all.csv
+*_even_all.csv
+
