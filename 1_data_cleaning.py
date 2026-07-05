@@ -184,7 +184,142 @@ print("\nPhysical activity quantiles:")
 print(df_clean[activity_weekly_cols].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 1.0]))
 
 
-# 6. Create current EDA charts
+# 6.Clean sleep Amount
+
+average_sleep_years = [2014]
+direct_sleep_years = [2020, 2022]
+clock_sleep_years = [2016, 2018, 2024]
+all_sleep_years = [2014, 2016, 2018, 2020, 2022, 2024]
+
+sleep_duration_vars = [
+    "weekday_sleep_hours",
+    "weekend_sleep_hours",
+    "sleep_avg_weighted",
+]
+
+df_clean["weekday_sleep_hours"] = pd.Series(pd.NA, index=df_clean.index, dtype="Float64")
+df_clean["weekend_sleep_hours"] = pd.Series(pd.NA, index=df_clean.index, dtype="Float64")
+
+
+def clean_sleep_numeric(col):
+    values = pd.to_numeric(df_clean[col], errors="coerce")
+    return values.where(~values.isin([88, 99]))
+
+
+direct_year_mask = df_clean["year"].isin(direct_sleep_years)
+df_clean.loc[direct_year_mask, "weekday_sleep_hours"] = clean_sleep_numeric("BP16_1").loc[direct_year_mask]
+df_clean.loc[direct_year_mask, "weekend_sleep_hours"] = clean_sleep_numeric("BP16_2").loc[direct_year_mask]
+
+
+def clock_total_minutes(hour_col, minute_col):
+    hour = clean_sleep_numeric(hour_col)
+    minute = clean_sleep_numeric(minute_col)
+
+    valid_time = hour.between(1, 24) & minute.between(0, 59)
+    hour = hour.where(valid_time)
+    minute = minute.where(valid_time)
+    hour = hour.replace({24: 0})
+
+    return hour * 60 + minute
+
+
+def sleep_duration_from_clock(bed_hour_col, bed_minute_col, wake_hour_col, wake_minute_col):
+    bed_total_minutes = clock_total_minutes(bed_hour_col, bed_minute_col)
+    wake_total_minutes = clock_total_minutes(wake_hour_col, wake_minute_col)
+    has_both_times = bed_total_minutes.notna() & wake_total_minutes.notna()
+
+    duration_minutes = wake_total_minutes - bed_total_minutes
+    duration_minutes = duration_minutes.where(
+        wake_total_minutes > bed_total_minutes,
+        wake_total_minutes + 1440 - bed_total_minutes,
+    )
+    duration_minutes = duration_minutes.where(has_both_times)
+
+    return duration_minutes / 60
+
+
+clock_year_mask = df_clean["year"].isin(clock_sleep_years)
+df_clean.loc[clock_year_mask, "weekday_sleep_hours"] = sleep_duration_from_clock(
+    "BP16_11", "BP16_12", "BP16_13", "BP16_14"
+).loc[clock_year_mask]
+df_clean.loc[clock_year_mask, "weekend_sleep_hours"] = sleep_duration_from_clock(
+    "BP16_21", "BP16_22", "BP16_23", "BP16_24"
+).loc[clock_year_mask]
+
+df_clean["sleep_avg_weighted"] = (
+    df_clean["weekday_sleep_hours"] * 5 + df_clean["weekend_sleep_hours"] * 2
+) / 7
+
+average_year_mask = df_clean["year"].isin(average_sleep_years)
+df_clean.loc[average_year_mask, "sleep_avg_weighted"] = clean_sleep_numeric("BP8").loc[average_year_mask]
+
+for variable in sleep_duration_vars:
+    flag_col = f"{variable}_implausible"
+    df_clean[flag_col] = df_clean[variable].notna() & (
+        (df_clean[variable] < 3) | (df_clean[variable] > 14)
+    )
+
+print("\nSleep duration missing counts by year:")
+print(df_clean.loc[df_clean["year"].isin(all_sleep_years)].groupby("year")[sleep_duration_vars].apply(lambda x: x.isna().sum()))
+
+print("\nSleep duration summary by year:")
+print(df_clean.loc[df_clean["year"].isin(all_sleep_years)].groupby("year")[sleep_duration_vars].describe())
+
+print("\nBiologically implausible sleep duration counts by year (<3 or >14 hours):")
+print(
+    df_clean.loc[df_clean["year"].isin(all_sleep_years)]
+    .groupby("year")[[f"{variable}_implausible" for variable in sleep_duration_vars]]
+    .sum()
+)
+
+sleep_duration_bins = [float("-inf"), 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, float("inf")]
+sleep_duration_bin_labels = [
+    "<3",
+    "3-<4",
+    "4-<5",
+    "5-<6",
+    "6-<7",
+    "7-<8",
+    "8-<9",
+    "9-<10",
+    "10-<11",
+    "11-<12",
+    "12-<13",
+    "13-<14",
+    "14+",
+]
+
+for variable in sleep_duration_vars:
+    sleep_duration_subset = df_clean.loc[df_clean["year"].isin(all_sleep_years), ["year", variable]].dropna()
+    binned_sleep_duration = pd.cut(
+        sleep_duration_subset[variable],
+        bins=sleep_duration_bins,
+        labels=sleep_duration_bin_labels,
+        right=False,
+    )
+    sleep_duration_counts = (
+        pd.crosstab(binned_sleep_duration, sleep_duration_subset["year"])
+        .reindex(index=sleep_duration_bin_labels, columns=all_sleep_years, fill_value=0)
+    )
+
+    print(f"\nBinned sleep duration counts for {variable}:")
+    print(sleep_duration_counts)
+
+    ax = sleep_duration_counts.plot(kind="bar", figsize=(14, 6), width=0.85)
+    ax.set_title(f"Binned distribution of {variable} by year")
+    ax.set_xlabel(variable)
+    ax.set_ylabel("Count")
+    ax.legend(title="Year")
+
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    plt.savefig(EDA_CHART_DIR / f"{variable}_by_year_barchart.png", dpi=300)
+    plt.close()
+
+    print(f"Saved chart: {EDA_CHART_DIR / f'{variable}_by_year_barchart.png'}")
+
+
+# Create current EDA charts
 
 chart_specs = [
     ("PHQ_sum", "PHQ_sum_bar_chart.png"),
@@ -204,40 +339,6 @@ for variable, output_name in chart_specs:
     ax.set_xlabel(variable)
     ax.set_ylabel("Count")
     ax.bar_label(ax.containers[0], fontsize=8)
-
-    plt.xticks(rotation=0)
-    plt.tight_layout()
-    plt.savefig(EDA_CHART_DIR / output_name, dpi=300)
-    plt.close()
-
-    print(f"Saved chart: {EDA_CHART_DIR / output_name}")
-
-
-sleep_years = [2016, 2018, 2024]
-sleep_hour_specs = [
-    ("BP16_11", "Weekday bedtime hour", "sleep_weekday_bedtime_hour_by_year.png"),
-    ("BP16_13", "Weekday wake-up hour", "sleep_weekday_wakeup_hour_by_year.png"),
-    ("BP16_21", "Weekend bedtime hour", "sleep_weekend_bedtime_hour_by_year.png"),
-    ("BP16_23", "Weekend wake-up hour", "sleep_weekend_wakeup_hour_by_year.png"),
-]
-
-for variable, title, output_name in sleep_hour_specs:
-    sleep_hour = pd.to_numeric(df_clean[variable], errors="coerce")
-    valid_sleep_mask = df_clean["year"].isin(sleep_years) & sleep_hour.between(1, 24)
-    sleep_counts = (
-        pd.crosstab(sleep_hour.loc[valid_sleep_mask].astype(int), df_clean.loc[valid_sleep_mask, "year"])
-        .reindex(index=range(1, 25), columns=sleep_years, fill_value=0)
-    )
-
-    print(f"\nSleep hour counts for {variable}:")
-    print(sleep_counts)
-    print(f"Excluded missing/nonresponse/out-of-range for {variable}: {(df_clean['year'].isin(sleep_years) & ~sleep_hour.between(1, 24)).sum()}")
-
-    ax = sleep_counts.plot(kind="bar", figsize=(14, 6), width=0.85)
-    ax.set_title(f"{title} distribution by year")
-    ax.set_xlabel("Hour value")
-    ax.set_ylabel("Count")
-    ax.legend(title="Year")
 
     plt.xticks(rotation=0)
     plt.tight_layout()
