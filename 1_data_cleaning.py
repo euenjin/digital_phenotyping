@@ -7,7 +7,7 @@ from pathlib import Path
 OUTPUT_DIR = Path(__file__).resolve().parent
 EDA_CHART_DIR = OUTPUT_DIR / "eda_chart"
 EDA_CHART_DIR.mkdir(exist_ok=True)
-DATA_PATH = OUTPUT_DIR / "HN14_24_even_all.csv"
+DATA_PATH = OUTPUT_DIR / "KNHANES_even_years_2014_2024_merged.csv"
 VALID_BP1 = [1, 2, 3, 4]
 
 # 1. Load original data
@@ -317,7 +317,7 @@ df_clean["HE_dbp_numeric"] = pd.to_numeric(
     errors="coerce"
 ).where(lambda x: x.between(30, 200))
 
-# pulse_pressure: 수축기 혈압에서 이완기 혈압을 뺀 맥압입니다.
+# pulse_pressure: 수축기 혈압에서 이완기 혈압을 뺀 맥압입니다.     심장이 한 번 뛸 때 혈관에 전달되는 압력 차이
 # 우울/불안 예측에서는 혈관 탄성이나 심혈관 노화 지표로 함께 볼 수 있습니다.
 valid_bp_mask = (
     df_clean["HE_sbp_numeric"].notna()
@@ -349,10 +349,84 @@ print("\nBlood pressure check:")
 print(df_clean[blood_pressure_vars].isna().sum())
 print(df_clean[blood_pressure_vars].describe())
 
-#Cleaning for 
+# Adjustment covariates
 
+df_clean["sex_numeric"] = pd.to_numeric(
+    df_clean["sex"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["sex_numeric"] = df_clean["sex_numeric"].where(
+    df_clean["sex_numeric"].isin([1, 2])
+)
 
+df_clean["age_numeric"] = pd.to_numeric(
+    df_clean["age"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["age_numeric"] = df_clean["age_numeric"].where(
+    df_clean["age_numeric"].between(0, 120)
+)
 
+df_clean["edu_numeric"] = pd.to_numeric(
+    df_clean["edu"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["edu_numeric"] = df_clean["edu_numeric"].where(
+    df_clean["edu_numeric"].isin([1, 2, 3, 4])
+)
+
+df_clean["marri_1_numeric"] = pd.to_numeric(
+    df_clean["marri_1"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["marri_1_numeric"] = df_clean["marri_1_numeric"].where(
+    df_clean["marri_1_numeric"].isin([1, 2])
+)
+
+df_clean["HE_obe_numeric"] = pd.to_numeric(
+    df_clean["HE_obe"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["HE_obe_numeric"] = df_clean["HE_obe_numeric"].where(
+    df_clean["HE_obe_numeric"].isin([1, 2, 3, 4, 5, 6])
+)
+
+df_clean["BS1_1_numeric"] = pd.to_numeric(
+    df_clean["BS1_1"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["BS1_1_recoded"] = df_clean["BS1_1_numeric"].replace({
+    3: 1,  # Never smoked
+    1: 2,  # Smoked less than 5 packs
+    2: 3,  # Smoked 5 packs or more
+})
+df_clean["BS1_1_recoded"] = df_clean["BS1_1_recoded"].where(
+    df_clean["BS1_1_numeric"].isin([1, 2, 3])
+)
+
+df_clean["BD2_31_numeric"] = pd.to_numeric(
+    df_clean["BD2_31"].astype(str).str.strip(),
+    errors="coerce"
+)
+df_clean["BD2_31_numeric"] = df_clean["BD2_31_numeric"].where(
+    df_clean["BD2_31_numeric"].isin([1, 2, 3, 4, 5])
+)
+
+print("\nAdjustment covariates check:")
+print("sex_numeric counts:")
+print(df_clean["sex_numeric"].value_counts(dropna=False).sort_index())
+print("age_numeric missing:", df_clean["age_numeric"].isna().sum())
+print(df_clean["age_numeric"].describe())
+print("edu_numeric counts:")
+print(df_clean["edu_numeric"].value_counts(dropna=False).sort_index())
+print("marri_1_numeric counts:")
+print(df_clean["marri_1_numeric"].value_counts(dropna=False).sort_index())
+print("HE_obe_numeric counts:")
+print(df_clean["HE_obe_numeric"].value_counts(dropna=False).sort_index())
+print("BS1_1 recoded counts:")
+print(df_clean["BS1_1_recoded"].value_counts(dropna=False).sort_index())
+print("BD2_31_numeric counts:")
+print(df_clean["BD2_31_numeric"].value_counts(dropna=False).sort_index())
 
 
 
@@ -386,6 +460,42 @@ chart_specs = [
     {
         "variable": "pulse_irregular",
         "output_name": "pulse_irregular_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "sex_numeric",
+        "output_name": "sex_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "age_numeric",
+        "output_name": "age_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
+    },
+    {
+        "variable": "edu_numeric",
+        "output_name": "edu_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "marri_1_numeric",
+        "output_name": "marri_1_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "HE_obe_numeric",
+        "output_name": "HE_obe_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "BS1_1_recoded",
+        "output_name": "BS1_1_recoded_bar_chart.png",
+        "chart_type": "value_counts",
+    },
+    {
+        "variable": "BD2_31_numeric",
+        "output_name": "BD2_31_bar_chart.png",
         "chart_type": "value_counts",
     },
     {

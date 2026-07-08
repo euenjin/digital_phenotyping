@@ -1,0 +1,35 @@
+PHQ-9 depression prediction
+Target: depression_phq10=1 when PHQ_sum >= 10
+Predictors: BP1_reversed, pulse_irregular, total_mvpa_min_week, weekday_sleep_hours, weekend_sleep_hours, sleep_avg_weighted, HE_glu_numeric, HE_sbp_numeric, HE_dbp_numeric, pulse_pressure, MAP, sex_numeric, age_numeric, edu_numeric, marri_1_numeric, HE_obe_numeric, BS1_1_recoded, BD2_31_numeric
+Excluded predictors: BP1_numeric
+Rows before dropna: 44313
+Rows after dropna: 18812
+Rows dropped by dropna: 25501
+Positive cases: 861
+Negative cases: 17951
+Positive rate: 0.0458
+
+Model performance:
+              model  accuracy  roc_auc       f1  precision   recall   tn  fp  fn  tp
+      Random Forest  0.914961 0.860172 0.349593    0.26875 0.500000 3357 234  86  86
+Logistic Regression  0.789795 0.859094 0.258669    0.15419 0.802326 2834 757  34 138
+
+Best model by ROC-AUC then F1: Random Forest
+
+Top SHAP features:
+            feature  mean_abs_shap
+       BP1_reversed       0.206979
+        sex_numeric       0.031704
+        age_numeric       0.030536
+ sleep_avg_weighted       0.028920
+        edu_numeric       0.026406
+weekday_sleep_hours       0.022143
+     HE_glu_numeric       0.021709
+      BS1_1_recoded       0.018680
+     pulse_pressure       0.018421
+weekend_sleep_hours       0.017636
+                MAP       0.017550
+     HE_sbp_numeric       0.016779
+     HE_dbp_numeric       0.016671
+total_mvpa_min_week       0.015262
+     BD2_31_numeric       0.011363
