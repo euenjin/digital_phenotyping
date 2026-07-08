@@ -7,7 +7,7 @@ from pathlib import Path
 OUTPUT_DIR = Path(__file__).resolve().parent
 EDA_CHART_DIR = OUTPUT_DIR / "eda_chart"
 EDA_CHART_DIR.mkdir(exist_ok=True)
-DATA_PATH = OUTPUT_DIR / "KNHANES_even_years_2014_2024_merged.csv"
+DATA_PATH = OUTPUT_DIR / "HN14_24_even_all.csv"
 VALID_BP1 = [1, 2, 3, 4]
 
 # 1. Load original data
@@ -289,9 +289,67 @@ sleep_duration_bin_labels = [
     "14+",
 ]
 
+# Cleaning for 공복혈당
+
+df_clean["HE_glu_numeric"] = pd.to_numeric(
+    df_clean["HE_glu"].astype(str).str.strip(),
+    errors="coerce"
+)
+
+print("\nFasting blood glucose check:")
+print("HE_glu missing:", df_clean["HE_glu_numeric"].isna().sum())
+print(df_clean["HE_glu_numeric"].describe())
 
 
+# Cleaning for 혈압
 
+# HE_sbp: 수축기 혈압으로, 심장이 수축할 때 혈관에 가해지는 압력입니다.
+# 우울/불안 예측에서는 스트레스 반응이나 심혈관 부담과 관련될 수 있어 확인합니다.
+df_clean["HE_sbp_numeric"] = pd.to_numeric(
+    df_clean["HE_sbp"].astype(str).str.strip(),
+    errors="coerce"
+).where(lambda x: x.between(50, 300))
+
+# HE_dbp: 이완기 혈압으로, 심장이 이완할 때 혈관에 남아 있는 압력입니다.
+# 우울/불안 예측에서는 만성 긴장, 자율신경계 변화와 관련될 수 있어 확인합니다.
+df_clean["HE_dbp_numeric"] = pd.to_numeric(
+    df_clean["HE_dbp"].astype(str).str.strip(),
+    errors="coerce"
+).where(lambda x: x.between(30, 200))
+
+# pulse_pressure: 수축기 혈압에서 이완기 혈압을 뺀 맥압입니다.
+# 우울/불안 예측에서는 혈관 탄성이나 심혈관 노화 지표로 함께 볼 수 있습니다.
+valid_bp_mask = (
+    df_clean["HE_sbp_numeric"].notna()
+    & df_clean["HE_dbp_numeric"].notna()
+    & (df_clean["HE_sbp_numeric"] > df_clean["HE_dbp_numeric"])
+)
+df_clean["pulse_pressure"] = pd.Series(pd.NA, index=df_clean.index, dtype="Float64")
+df_clean.loc[valid_bp_mask, "pulse_pressure"] = (
+    df_clean.loc[valid_bp_mask, "HE_sbp_numeric"]
+    - df_clean.loc[valid_bp_mask, "HE_dbp_numeric"]
+)
+
+# MAP: 평균동맥압으로, 한 심박 주기 동안의 평균 혈압을 추정한 값입니다.
+# 우울/불안 예측에서는 전반적인 혈류 부담과 생리적 스트레스 상태를 반영할 수 있습니다.
+df_clean["MAP"] = pd.Series(pd.NA, index=df_clean.index, dtype="Float64")
+df_clean.loc[valid_bp_mask, "MAP"] = (
+    df_clean.loc[valid_bp_mask, "HE_dbp_numeric"]
+    + df_clean.loc[valid_bp_mask, "pulse_pressure"] / 3
+)
+
+blood_pressure_vars = [
+    "HE_sbp_numeric",
+    "HE_dbp_numeric",
+    "pulse_pressure",
+    "MAP",
+]
+
+print("\nBlood pressure check:")
+print(df_clean[blood_pressure_vars].isna().sum())
+print(df_clean[blood_pressure_vars].describe())
+
+#Cleaning for 
 
 
 
@@ -329,6 +387,36 @@ chart_specs = [
         "variable": "pulse_irregular",
         "output_name": "pulse_irregular_bar_chart.png",
         "chart_type": "value_counts",
+    },
+    {
+        "variable": "HE_glu_numeric",
+        "output_name": "HE_glu_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
+    },
+    {
+        "variable": "HE_sbp_numeric",
+        "output_name": "HE_sbp_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
+    },
+    {
+        "variable": "HE_dbp_numeric",
+        "output_name": "HE_dbp_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
+    },
+    {
+        "variable": "pulse_pressure",
+        "output_name": "pulse_pressure_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
+    },
+    {
+        "variable": "MAP",
+        "output_name": "MAP_histogram.png",
+        "chart_type": "histogram",
+        "bins": 50,
     },
     {
         "variable": "weekday_sleep_hours",
@@ -380,6 +468,17 @@ for chart_spec in chart_specs:
         ax.set_ylabel("Count")
         ax.bar_label(ax.containers[0], fontsize=8)
         plt.xticks(rotation=0)
+
+    elif chart_type == "histogram":
+        values = df_clean[variable].dropna()
+
+        print(f"\nDistribution summary for {variable}:")
+        print(values.describe())
+
+        ax = values.plot(kind="hist", bins=chart_spec["bins"], figsize=(12, 6), edgecolor="black")
+        ax.set_title(f"Distribution of {variable}")
+        ax.set_xlabel(variable)
+        ax.set_ylabel("Count")
 
     elif chart_type == "binned":
         binned = pd.cut(
