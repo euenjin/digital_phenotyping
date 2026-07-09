@@ -1,0 +1,12 @@
+feature,missing_count,missing_rate,imputation_strategy
+BP1_reversed,155,0.004799653186350406,most_frequent
+pulse_irregular,169,0.0052331702483433456,most_frequent
+total_mvpa_min_week,75,0.002322412832105035,median
+weekday_sleep_hours,5036,0.15594228029974608,median
+weekend_sleep_hours,5037,0.15597324580417415,median
+sleep_avg_weighted,152,0.004706756673066205,median
+HE_glu_numeric,1145,0.03545550257013687,median
+HE_sbp_numeric,195,0.006038273363473091,median
+HE_dbp_numeric,196,0.006069238867901158,median
+pulse_pressure,196,0.006069238867901158,median
+MAP,196,0.006069238867901158,median

@@ -1,0 +1,71 @@
+PHQ-9 depression prediction
+Target: depression_phq10=1 when PHQ_sum >= 10
+
+Adjusted model set
+Predictors: BP1_reversed, pulse_irregular, total_mvpa_min_week, weekday_sleep_hours, weekend_sleep_hours, sleep_avg_weighted, HE_glu_numeric, HE_sbp_numeric, HE_dbp_numeric, pulse_pressure, MAP, sex_numeric, age_numeric, edu_numeric, marri_1_numeric, HE_obe_numeric, BS1_1_recoded, BD2_31_numeric
+Excluded predictors: BP1_numeric
+Rows before dropna: 44313
+Rows after dropna: 18812
+Rows dropped by dropna: 25501
+Positive cases: 861
+Negative cases: 17951
+Positive rate: 0.0458
+
+Model performance:
+ variant               model  accuracy  roc_auc       f1  precision   recall   tn  fp  fn  tp
+Adjusted Logistic Regression  0.789795 0.859094 0.258669   0.154190 0.802326 2834 757  34 138
+Adjusted       Random Forest  0.948445 0.858820 0.326389   0.405172 0.273256 3522  69 125  47
+
+Best model by ROC-AUC then F1: Logistic Regression
+
+Top SHAP features:
+            feature  mean_abs_shap
+       BP1_reversed       0.928771
+        sex_numeric       0.428833
+        edu_numeric       0.368134
+      BS1_1_recoded       0.309459
+    marri_1_numeric       0.236131
+weekend_sleep_hours       0.072453
+     HE_glu_numeric       0.050203
+     pulse_pressure       0.043699
+     BD2_31_numeric       0.034677
+weekday_sleep_hours       0.034518
+total_mvpa_min_week       0.027865
+    pulse_irregular       0.025421
+     HE_dbp_numeric       0.024361
+     HE_sbp_numeric       0.018052
+        age_numeric       0.017300
+
+Unadjusted model set
+Predictors: BP1_reversed, pulse_irregular, total_mvpa_min_week, weekday_sleep_hours, weekend_sleep_hours, sleep_avg_weighted, HE_glu_numeric, HE_sbp_numeric, HE_dbp_numeric, pulse_pressure, MAP
+Excluded predictors: BP1_numeric, sex_numeric, age_numeric, edu_numeric, marri_1_numeric, HE_obe_numeric, BS1_1_recoded, BD2_31_numeric
+Rows before dropna: 44313
+Rows after dropna: 26314
+Rows dropped by dropna: 17999
+Positive cases: 1297
+Negative cases: 25017
+Positive rate: 0.0493
+
+Model performance:
+   variant               model  accuracy  roc_auc       f1  precision   recall   tn   fp  fn  tp
+Unadjusted       Random Forest  0.929698 0.824956 0.285714   0.285714 0.285714 4819  185 185  74
+Unadjusted Logistic Regression  0.767813 0.823519 0.246609   0.146735 0.772201 3841 1163  59 200
+
+Best model by ROC-AUC then F1: Random Forest
+
+Top SHAP features:
+            feature  mean_abs_shap
+       BP1_reversed       0.181793
+ sleep_avg_weighted       0.042368
+     HE_glu_numeric       0.037087
+                MAP       0.036288
+     pulse_pressure       0.035416
+     HE_sbp_numeric       0.032628
+     HE_dbp_numeric       0.032211
+weekday_sleep_hours       0.032186
+total_mvpa_min_week       0.029693
+weekend_sleep_hours       0.025953
+    pulse_irregular       0.001077
+
+Saved comparison chart:
+analysis_result/complete_case/comparison/adjusted_vs_unadjusted_model_performance.png

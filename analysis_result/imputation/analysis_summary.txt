@@ -1,0 +1,101 @@
+PHQ-9 depression prediction with predictor imputation
+Target: depression_phq10=1 when PHQ_sum >= 10
+Target was not imputed; rows with missing target were excluded.
+
+Adjusted imputed model set
+Predictors: BP1_reversed, pulse_irregular, total_mvpa_min_week, weekday_sleep_hours, weekend_sleep_hours, sleep_avg_weighted, HE_glu_numeric, HE_sbp_numeric, HE_dbp_numeric, pulse_pressure, MAP, sex_numeric, age_numeric, edu_numeric, marri_1_numeric, HE_obe_numeric, BS1_1_recoded, BD2_31_numeric
+Excluded predictors: BP1_numeric
+Imputation: median for continuous predictors, most_frequent for categorical predictors
+Rows before target drop: 44313
+Rows after target drop: 32294
+Rows dropped for missing target: 12019
+Positive cases: 1723
+Negative cases: 30571
+Positive rate: 0.0534
+
+Model performance:
+ variant               model  accuracy  roc_auc       f1  precision   recall   tn   fp  fn  tp
+Adjusted       Random Forest  0.928472 0.851389 0.316568   0.323263 0.310145 5890  224 238 107
+Adjusted Logistic Regression  0.775972 0.848338 0.265855   0.161132 0.759420 4750 1364  83 262
+
+Best model by ROC-AUC then F1: Random Forest
+
+Top SHAP features:
+            feature  mean_abs_shap
+       BP1_reversed       0.179373
+ sleep_avg_weighted       0.043741
+        edu_numeric       0.031949
+        sex_numeric       0.031316
+        age_numeric       0.030044
+     HE_glu_numeric       0.026762
+     pulse_pressure       0.025413
+                MAP       0.024530
+     HE_sbp_numeric       0.023965
+     HE_dbp_numeric       0.022533
+total_mvpa_min_week       0.021593
+weekday_sleep_hours       0.018324
+weekend_sleep_hours       0.015941
+      BS1_1_recoded       0.013108
+    marri_1_numeric       0.010940
+
+Most-missing imputed predictors:
+            feature  missing_count  missing_rate imputation_strategy
+     BD2_31_numeric           9365      0.289992       most_frequent
+weekend_sleep_hours           5037      0.155973              median
+weekday_sleep_hours           5036      0.155942              median
+     HE_glu_numeric           1145      0.035456              median
+     HE_obe_numeric            395      0.012231       most_frequent
+                MAP            196      0.006069              median
+     pulse_pressure            196      0.006069              median
+     HE_dbp_numeric            196      0.006069              median
+     HE_sbp_numeric            195      0.006038              median
+    pulse_irregular            169      0.005233       most_frequent
+
+Unadjusted imputed model set
+Predictors: BP1_reversed, pulse_irregular, total_mvpa_min_week, weekday_sleep_hours, weekend_sleep_hours, sleep_avg_weighted, HE_glu_numeric, HE_sbp_numeric, HE_dbp_numeric, pulse_pressure, MAP
+Excluded predictors: BP1_numeric, sex_numeric, age_numeric, edu_numeric, marri_1_numeric, HE_obe_numeric, BS1_1_recoded, BD2_31_numeric
+Imputation: median for continuous predictors, most_frequent for categorical predictors
+Rows before target drop: 44313
+Rows after target drop: 32294
+Rows dropped for missing target: 12019
+Positive cases: 1723
+Negative cases: 30571
+Positive rate: 0.0534
+
+Model performance:
+   variant               model  accuracy  roc_auc       f1  precision   recall   tn   fp  fn  tp
+Unadjusted       Random Forest  0.923208 0.819168 0.322404   0.304910 0.342029 5845  269 227 118
+Unadjusted Logistic Regression  0.762037 0.813762 0.253521   0.152275 0.756522 4661 1453  84 261
+
+Best model by ROC-AUC then F1: Random Forest
+
+Top SHAP features:
+            feature  mean_abs_shap
+       BP1_reversed       0.186581
+ sleep_avg_weighted       0.054151
+     pulse_pressure       0.037241
+     HE_glu_numeric       0.036380
+                MAP       0.033839
+     HE_sbp_numeric       0.033498
+     HE_dbp_numeric       0.031264
+total_mvpa_min_week       0.029972
+weekday_sleep_hours       0.022420
+weekend_sleep_hours       0.018844
+    pulse_irregular       0.000649
+
+Most-missing imputed predictors:
+            feature  missing_count  missing_rate imputation_strategy
+weekend_sleep_hours           5037      0.155973              median
+weekday_sleep_hours           5036      0.155942              median
+     HE_glu_numeric           1145      0.035456              median
+                MAP            196      0.006069              median
+     pulse_pressure            196      0.006069              median
+     HE_dbp_numeric            196      0.006069              median
+     HE_sbp_numeric            195      0.006038              median
+    pulse_irregular            169      0.005233       most_frequent
+       BP1_reversed            155      0.004800       most_frequent
+ sleep_avg_weighted            152      0.004707              median
+
+Saved charts:
+analysis_result/imputation/comparison/adjusted_vs_unadjusted_model_performance.png
+analysis_result/imputation/comparison/complete_case_vs_imputed_model_performance.png

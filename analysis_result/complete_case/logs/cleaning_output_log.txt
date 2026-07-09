@@ -1,5 +1,5 @@
-Original raw_df shape: (44313, 1327)
-df_clean initial shape: (44313, 1327)
+Original raw_df shape: (44313, 1345)
+df_clean initial shape: (44313, 1345)
 
 PHQ_sum check:
 Invalid PHQ_sum outside 0-27: 0
@@ -166,8 +166,8 @@ max        243.000000      139.000000           150.0  165.666667
 Adjustment covariates check:
 sex_numeric counts:
 sex_numeric
-1    19971
-2    24342
+1.0    19971
+2.0    24342
 Name: count, dtype: int64
 age_numeric missing: 0
 count    44313.000000
@@ -251,7 +251,7 @@ PHQ_sum
 26        5
 27       23
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\PHQ_sum_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\PHQ_sum_bar_chart.png
 
 Value counts for BP1_numeric:
 BP1_numeric
@@ -260,7 +260,7 @@ BP1_numeric
 3    20793
 4     6740
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\BP1_original_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\BP1_original_bar_chart.png
 
 Value counts for BP1_reversed:
 BP1_reversed
@@ -269,21 +269,21 @@ BP1_reversed
 3     7751
 4     1697
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\BP1_reversed_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\BP1_reversed_bar_chart.png
 
 Value counts for pulse_irregular:
 pulse_irregular
 0    38796
 1      546
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\pulse_irregular_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\pulse_irregular_bar_chart.png
 
 Value counts for sex_numeric:
 sex_numeric
 1    19971
 2    24342
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\sex_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\sex_bar_chart.png
 
 Distribution summary for age_numeric:
 count    44313.000000
@@ -295,7 +295,7 @@ min          1.000000
 75%         63.000000
 max         80.000000
 Name: age_numeric, dtype: float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\age_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\age_histogram.png
 
 Value counts for edu_numeric:
 edu_numeric
@@ -304,14 +304,14 @@ edu_numeric
 3    11137
 4    12389
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\edu_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\edu_bar_chart.png
 
 Value counts for marri_1_numeric:
 marri_1_numeric
 1    29883
 2    14425
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\marri_1_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\marri_1_bar_chart.png
 
 Value counts for HE_obe_numeric:
 HE_obe_numeric
@@ -322,7 +322,7 @@ HE_obe_numeric
 5     1251
 6      234
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\HE_obe_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\HE_obe_bar_chart.png
 
 Value counts for BS1_1_recoded:
 BS1_1_recoded
@@ -330,7 +330,7 @@ BS1_1_recoded
 2      752
 3    12669
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\BS1_1_recoded_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\BS1_1_recoded_bar_chart.png
 
 Value counts for BD2_31_numeric:
 BD2_31_numeric
@@ -340,7 +340,7 @@ BD2_31_numeric
 4     4488
 5     1503
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\BD2_31_bar_chart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\BD2_31_bar_chart.png
 
 Distribution summary for HE_glu_numeric:
 count    36877.000000
@@ -352,7 +352,7 @@ min         40.000000
 75%        104.000000
 max        553.000000
 Name: HE_glu_numeric, dtype: float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\HE_glu_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\HE_glu_histogram.png
 
 Distribution summary for HE_sbp_numeric:
 count    39180.000000
@@ -364,7 +364,7 @@ min         65.000000
 75%        128.000000
 max        243.000000
 Name: HE_sbp_numeric, dtype: float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\HE_sbp_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\HE_sbp_histogram.png
 
 Distribution summary for HE_dbp_numeric:
 count    39178.000000
@@ -376,7 +376,7 @@ min         32.000000
 75%         80.500000
 max        139.000000
 Name: HE_dbp_numeric, dtype: float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\HE_dbp_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\HE_dbp_histogram.png
 
 Distribution summary for pulse_pressure:
 count      39178.0
@@ -388,7 +388,7 @@ min           15.0
 75%           50.0
 max          150.0
 Name: pulse_pressure, dtype: Float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\pulse_pressure_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\pulse_pressure_histogram.png
 
 Distribution summary for MAP:
 count       39178.0
@@ -400,7 +400,7 @@ min            43.0
 75%       95.666667
 max      165.666667
 Name: MAP, dtype: Float64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\MAP_histogram.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\MAP_histogram.png
 
 Binned counts for weekday_sleep_hours by year:
 year                 2014  2016  2018  2020  2022  2024
@@ -418,7 +418,7 @@ weekday_sleep_hours
 12-<13                  0     7     2     9     8     7
 13-<14                  0     4     1     0     0     2
 14+                     0     2     1     1     1     1
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\weekday_sleep_hours_by_year_barchart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\weekday_sleep_hours_by_year_barchart.png
 
 Binned counts for weekend_sleep_hours by year:
 year                 2014  2016  2018  2020  2022  2024
@@ -436,7 +436,7 @@ weekend_sleep_hours
 12-<13                  0    52    54    83    94    44
 13-<14                  0    15    14     7     3    17
 14+                     0     6     4     9     8    12
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\weekend_sleep_hours_by_year_barchart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\weekend_sleep_hours_by_year_barchart.png
 
 Binned counts for sleep_avg_weighted by year:
 year                2014  2016  2018  2020  2022  2024
@@ -454,7 +454,7 @@ sleep_avg_weighted
 12-<13                17     6     2     7     8     5
 13-<14                 1     3     1     2     0     3
 14+                    0     2     1     1     1     1
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\sleep_avg_weighted_by_year_barchart.png
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\sleep_avg_weighted_by_year_barchart.png
 
 Binned counts for total_mvpa_min_week:
 total_mvpa_min_week
@@ -467,5 +467,5 @@ total_mvpa_min_week
 300-599     5234
 600+        2895
 Name: count, dtype: int64
-Saved chart: C:\Users\boein\OneDrive\바탕 화면\국건영\digital_phenotyping\eda_chart\total_mvpa_min_week_barchart.png
-Current df_clean shape: (44313, 1372)
+Saved chart: C:\Users\eunji\OneDrive\바탕 화면\digital_phenotyping\eda_chart\total_mvpa_min_week_barchart.png
+Current df_clean shape: (44313, 1390)
