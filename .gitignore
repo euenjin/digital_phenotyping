@@ -1,3 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -12,4 +17,8 @@ HN*.csv
 KNHANES*.csv
 *_all.csv
 *_even_all.csv
+sav_files/
 
+# Temporary Office files
+~$*
+~WRD*.tmp
